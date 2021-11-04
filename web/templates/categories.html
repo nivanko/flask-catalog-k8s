@@ -1,0 +1,73 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Camping and Hiking Items</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',
+  filename = 'style.css') }}" />
+</head>
+
+<body>
+
+  <table id="header">
+    <tr>
+      <td>
+        <h1>The Call of the Wild</h1>
+        <h3 style="color: Black">Camping and Hiking Items Catalog</h3>
+      </td>
+      <td align="left">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+            <strong> {{ message }} </strong>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+      </td>
+      <td align="right">
+        {% if login is none %}
+        <form action="{{ url_for('login')}}">
+          <input type="submit" value="Log in">
+        </form>
+        {% else %}
+        <form action="{{ url_for('logout')}}">
+          <input type="submit" value="Log out">
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+  <table id="content_tbl">
+    <tr>
+      <td id="menu_col" valign="top">
+        <h2 style="color: Black">Categories</h2>
+
+        {% for c in categories %}
+
+        <a href="{{url_for('list_items', category_name = c.name) }}"
+        style="color: Red">{{ c.name }}</a><br>
+
+        {% endfor %}
+
+      </td>
+
+      <td id="content_col" valign="top">
+        {% if login is not none %}
+        <a href="{{ url_for('add_item') }}" style="color: Red">Add Item</a>
+        {% endif %}
+
+        <h2 style="color: Black">Latest Items</h2>
+
+        {% for i in items %}
+
+        <span class="redText">{{ i.name }}</span> <span class="greyText">
+          ({{ i.category.name }})
+        </span></br>
+
+        {% endfor %}
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

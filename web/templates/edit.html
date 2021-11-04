@@ -1,0 +1,81 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Edit Item</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',
+  filename = 'style.css') }}" />
+</head>
+
+<body>
+
+  <table id="header">
+    <tr>
+      <td>
+        <h1>The Call of the Wild</h1>
+        <h3 style="color: Black">Camping and Hiking Items Catalog</h3>
+
+      </td>
+
+      <td align="right">
+        {% if login is none %}
+        <form action="{{ url_for('login')}}">
+          <input type="submit" value="Log in">
+        </form>
+        {% else %}
+        <form action="{{ url_for('logout')}}">
+          <input type="submit" value="Log out">
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+  <table id="content_tbl">
+    <tr>
+      <td id="content_col" valign="top">
+        <form action="{{ url_for('edit_item',
+        category_name = item.category.name,
+        item_name = item.name) }}"
+        method="post"
+        enctype=multipart/form-data>
+        <h2 style="color: Black">Edit Item</h2>
+        <p>Title:
+          <p><input type=text maxlength="50" name="name"
+            value="{{ item.name }}">
+        <p>Description:
+        {% if item.description == None %}
+        <p><input type=text maxlength="250" name="description"
+          value="">
+        {% else %}
+        <p><input type=text maxlength="250" name="description"
+          value="{{ item.description }}">
+        {% endif %}
+        <p>Category:
+              <p><select name="category_id" size="1">
+                {% for c in categories %}
+
+                <option value="{{ c.id }}"
+                {% if c.id == category_id %}
+                selected="selected"
+                {% endif %}
+                >
+                {{ c.name }}
+              </option>
+
+              {% endfor %}
+            </select>
+        <p>Image:
+        {% if item.picture == None %}
+        <p><img src="{{ url_for('static', filename = 'no-image-available.png') }}"
+        alt="No Image" style="width:100px;height:100px;">
+        {% else %}
+        <p><img src="{{ url_for('show_image', filename = item.picture) }}"
+        alt="Item Image" style="width:auto;height:100px;">
+        {% endif %}
+        <p><input type=file name=image value="Select new image">
+        <p><input type=submit value="Save">
+        </form>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

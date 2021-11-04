@@ -1,0 +1,39 @@
+body {
+            background: #DDDDDD;
+            color: #000000;
+            font-family: Trebuchet MS, Arial, Times New Roman;
+            font-size: 14px;
+}
+
+#header {
+            background: #00AFFF;
+            color: White;
+            height: auto;
+            width: 100%;
+            font-family: Trebuchet MS, Arial, Times New Roman;
+            font-size: 14px;
+}
+
+#content_tbl {
+            width: 100%;
+}
+
+#menu_col {
+            background: #FFFFFF;
+            border-style: hidden groove hidden hidden;
+            color: Black;
+            float: left;
+            width: 150px;
+            height: 500px;
+}
+
+#content_col {
+            background: #FFFFFF;
+            float: left;
+            width: auto;
+            height: 500px;
+}
+
+span.redText { color: Red; }
+
+span.greyText { color: Grey; font-style: italic; }
