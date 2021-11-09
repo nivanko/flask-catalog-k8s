@@ -16,22 +16,33 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            ls
-            pwd
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip && pip install -r web/requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: dependencies-{{ checksum "web/requirements.txt" }}
       - run:
           name: run lint
           command: |
             . venv/bin/activate
             pylint --disable=R,C,W1203 web/app.py 
+      - save_cache:
+          paths:
+            - ./venv
+          key: dependencies-{{ checksum "web/requirements.txt" }}
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run: |
+          docker build -t ${DOCKER_HUB_USERNAME}/catalog-db:1.0.1 ./db
+          docker build -t ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1 ./web
+      - run: |
+          docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
+          docker push ${DOCKER_HUB_USERNAME}/catalog-db:1.0.1
+          docker push ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1
 
 workflows:
-  default:
+  eks_application:
     jobs:
       - test
+      - build:
+          requires: [test]
