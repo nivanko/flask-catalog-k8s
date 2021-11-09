@@ -39,6 +39,17 @@ jobs:
           docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
           docker push ${DOCKER_HUB_USERNAME}/catalog-db:1.0.1
           docker push ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1
+  create_cluster:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: |
+          mkdir ~/bin
+          export URL="https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz"
+          curl --silent --location ${URL} | tar xz -C ~/bin
+          ~/bin/eksctl create cluster --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} \
+          --with-oidc --ssh-access --ssh-public-key ${AWS_SSH_KEY}
 
 workflows:
   eks_application:
@@ -46,3 +57,5 @@ workflows:
       - test
       - build:
           requires: [test]
+      - create_cluster:
+          requires: [build]
