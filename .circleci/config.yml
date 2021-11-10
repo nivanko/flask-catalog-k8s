@@ -101,6 +101,16 @@ jobs:
           ~/bin/eksctl utils write-kubeconfig --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}
           export APP_URL=$(~/bin/kubectl get services web -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
           curl http://${APP_URL}/catalog/
+  delete_cluster:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run: |
+          ~/bin/eksctl delete cluster --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}
 
 workflows:
   eks_application:
@@ -116,3 +126,5 @@ workflows:
           requires: [deploy_application]
       - smoke_test:
           requires: [update_application]
+      - delete_cluster:
+          requires: [smoke_test]
