@@ -37,7 +37,7 @@ jobs:
           docker build -t ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1 ./web
       # Update application version
       - run: |
-          sed -i s/1.0.1/1.0.2/ web/app.py
+          sed -i s/1.0.1/1.0.2/ ./web/app.py
           docker build -t ${DOCKER_HUB_USERNAME}/catalog-web:1.0.2 ./web
       - run: |
           echo ${DOCKER_HUB_PASSWORD} | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
@@ -89,6 +89,18 @@ jobs:
       - run: |
           ~/bin/eksctl utils write-kubeconfig --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}
           ~/bin/kubectl set image deployment/web web=nivanko/catalog-web:1.0.2
+  smoke_test:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run: |
+          ~/bin/eksctl utils write-kubeconfig --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}
+          export APP_URL=$(~/bin/kubectl get services web -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          curl http://${APP_URL}/catalog/
 
 workflows:
   eks_application:
