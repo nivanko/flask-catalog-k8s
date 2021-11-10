@@ -40,7 +40,7 @@ jobs:
           sed -i s/1.0.1/1.0.2/ web/app.py
           docker build -t ${DOCKER_HUB_USERNAME}/catalog-web:1.0.2 ./web
       - run: |
-          docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
+          echo ${DOCKER_HUB_PASSWORD} | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
           docker push ${DOCKER_HUB_USERNAME}/catalog-db:1.0.1
           docker push ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1
           docker push ${DOCKER_HUB_USERNAME}/catalog-web:1.0.2
@@ -78,6 +78,17 @@ jobs:
           root: ~/
           paths:
             - bin
+  update_application:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run: |
+          ~/bin/eksctl utils write-kubeconfig --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}
+          ~/bin/kubectl set image deployment/web web=nivanko/catalog-web:1.0.2
 
 workflows:
   eks_application:
@@ -89,3 +100,5 @@ workflows:
           requires: [build]
       - deploy_application:
           requires: [create_cluster]
+      - update_application:
+          requires: [deploy_application]
