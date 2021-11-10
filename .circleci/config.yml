@@ -114,3 +114,5 @@ workflows:
           requires: [create_cluster]
       - update_application:
           requires: [deploy_application]
+      - smoke_test:
+          requires: [update_application]
