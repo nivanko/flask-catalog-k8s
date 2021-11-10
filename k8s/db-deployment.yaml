@@ -30,12 +30,13 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: password
-          image: nivanko/catalog-db
+          image: nivanko/catalog-db:1.0.1
+          imagePullPolicy: Always
           name: db
-          resources: {}
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: db
+              subPath: postgres
       restartPolicy: Always
       volumes:
         - name: db

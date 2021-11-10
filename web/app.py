@@ -366,4 +366,5 @@ def check_image(image):
 if __name__ == '__main__':
     app.secret_key = 'cgvSdvbFudzOunQFaklmHA=='  # super secret key
     app.debug = True
+    LOG.info("Version: 1.0.1")
     app.run(host='0.0.0.0', port=8000)

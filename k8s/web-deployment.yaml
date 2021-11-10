@@ -5,20 +5,24 @@ metadata:
     app: web
   name: web
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: web
-  strategy: {}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: web
     spec:
       containers:
-        - image: nivanko/catalog-web
+        - image: nivanko/catalog-web:1.0.1
+          imagePullPolicy: Always
           name: web
           ports:
             - containerPort: 8000
-          resources: {}
       restartPolicy: Always
