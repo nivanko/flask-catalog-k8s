@@ -35,10 +35,15 @@ jobs:
       - run: |
           docker build -t ${DOCKER_HUB_USERNAME}/catalog-db:1.0.1 ./db
           docker build -t ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1 ./web
+      # Update application version
+      - run: |
+          sed -i s/1.0.1/1.0.2/ web/app.py
+          docker build -t ${DOCKER_HUB_USERNAME}/catalog-web:1.0.2 ./web
       - run: |
           docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
           docker push ${DOCKER_HUB_USERNAME}/catalog-db:1.0.1
           docker push ${DOCKER_HUB_USERNAME}/catalog-web:1.0.1
+          docker push ${DOCKER_HUB_USERNAME}/catalog-web:1.0.2
   create_cluster:
     docker:
       - image: amazon/aws-cli
@@ -49,8 +54,30 @@ jobs:
           mkdir ~/bin
           export URL="https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz"
           curl --silent --location ${URL} | tar xz -C ~/bin
-          ~/bin/eksctl create cluster --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} \
-          --with-oidc --ssh-access --ssh-public-key ${AWS_SSH_KEY}
+#          ~/bin/eksctl create cluster --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} \
+#          --with-oidc --ssh-access --ssh-public-key ${AWS_SSH_KEY}
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - bin
+  deploy_application:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run: |
+          export URL="https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -L ${URL} -o ~/bin/kubectl
+          chmod +x ~/bin/kubectl
+          ~/bin/eksctl utils write-kubeconfig --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}
+          ~/bin/kubectl apply -f ./k8s
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - bin
 
 workflows:
   eks_application:
@@ -60,3 +87,5 @@ workflows:
           requires: [test]
       - create_cluster:
           requires: [build]
+      - deploy_application:
+          requires: [create_cluster]
