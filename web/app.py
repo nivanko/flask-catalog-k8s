@@ -329,7 +329,7 @@ def get_user_id(username):
 
 
 def get_user_info(user_id):
-    user = db_session.query(User).filter_by(id=user_id).one()
+    user = session.query(User).filter_by(id=user_id).one()
     return user
 
 

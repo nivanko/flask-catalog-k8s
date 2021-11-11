@@ -54,8 +54,8 @@ jobs:
           mkdir ~/bin
           export URL="https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz"
           curl --silent --location ${URL} | tar xz -C ~/bin
-#          ~/bin/eksctl create cluster --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} \
-#          --with-oidc --ssh-access --ssh-public-key ${AWS_SSH_KEY}
+          ~/bin/eksctl create cluster --name ${AWS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} \
+          --with-oidc --ssh-access --ssh-public-key ${AWS_SSH_KEY}
       - persist_to_workspace:
           root: ~/
           paths:
