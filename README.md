@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/nivanko/flask-catalog-k8s/tree/master.svg?style=svg)](https://circleci.com/gh/nivanko/flask-catalog-k8s/tree/master)  
+
 About this project
 ------------------
 This project is a containerized version of [Flask Catalog](https://github.com/nivanko/flask-catalog), other project
